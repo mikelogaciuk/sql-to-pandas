@@ -41,8 +41,8 @@ for i, row in stores_list.iterrows():
     host_name = f"{store}avroce_ora"
 
     store_connection = xd.OracleConnection(host_name, FAKE_ORA_USR, FAKE_ORA_PWD, FAKE_ORA_SID, FAKE_ORA_PORT)
-    store_data_df = store_connection.query(f"""SELECT 
-                               store, sale_id, sale_date, sale_number, sale_value, sale_tax 
+    store_data_df = store_connection.query(f"""SELECT
+                               store, sale_id, sale_date, sale_number, sale_value, sale_tax
                                FROM sales
                                WHERE sale_date >= {yesterday}
                                """)
@@ -52,6 +52,70 @@ for i, row in stores_list.iterrows():
     mssql_connection.push_data(store_data_df, "dbo.Sales", "staging")
 
     logger.info(f"Data pushed into: {FAKE_SQL_HOST} in staging of: {FAKE_SQL_DB}")
+```
+
+## Oracle Support
+
+Install Oracle Client x64 from [here](https://www.oracle.com/pl/database/technologies/instant-client/winx64-64-downloads.html):
+
+```xd
+* Download the appropriate Instant Client packages for your platform.
+* All installations require the Basic or Basic Light package.
+* Unzip the packages into a single directory such as C:\oracle\instantclient_21_6
+* Add this directory to the PATH environment variable.
+```
+
+For Ubuntu you can use this snippet for Oracle Client:
+
+```bash
+sudo apt-get install libaio1 libaio-dev
+
+sudo mkdir /opt/oracle
+cd /opt/oracle/
+
+sudo wget https://download.oracle.com/otn_software/linux/instantclient/216000/instantclient-basic-linux.x64-21.6.0.0.0dbru.zip
+sudo wget https://download.oracle.com/otn_software/linux/instantclient/216000/instantclient-sqlplus-linux.x64-21.6.0.0.0dbru.zip
+
+sudo unzip instantclient-basic-linux.x64-21.6.0.0.0dbru.zip
+sudo unzip instantclient-sqlplus-linux.x64-21.6.0.0.0dbru.zip
+
+cd instantclient_21_6
+
+sudo sh -c "echo /opt/oracle/instantclient_21_6 > \
+      /etc/ld.so.conf.d/oracle-instantclient.conf"
+
+sudo nano ~/.bashrc
+
+export ORACLE_HOME=/opt/oracle/instantclient_21_6
+export LD_LIBRARY_PATH=$ORACLE_HOME:$LD_LIBRARY_PATH
+export PATH=$ORACLE_HOME:$PATH
+
+source ~/.bashrc
+
+sudo ldconfig
+```
+
+### Linux
+
+For Linux and Oracle connections use environment variables:
+
+```shell
+sudo nano ~/.profile
+```
+
+Add:
+
+```shell
+export FAKE_ORA_PWD="###############"
+export DOMAIN_NAME="###############"
+export DOMAIN_USR="###############"
+export DOMAIN_PWD="###############"
+```
+
+Build and restart machine:
+
+```shell
+source ~/.profile
 ```
 
 ## License
